@@ -7,7 +7,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ZapatillaController implements IZapatillaService {
+public class ZapatillaController implements IZapatillaController {
 
     @Override
     public List<Zapatilla> obtenerTodas() {
