@@ -23,6 +23,10 @@ public class Compra {
         this(0, idCliente, idZapatilla, fechaCompra, cantidad, total);
     }
 
+    public Compra() {
+
+    }
+
     public int getIdCompra() {
         return idCompra;
     }
