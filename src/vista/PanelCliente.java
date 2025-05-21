@@ -1,0 +1,180 @@
+package vista;
+
+import controlador.CompraController;
+import controlador.ZapatillaController;
+import modelo.Usuario;
+import modelo.Zapatilla;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.Date;
+import java.util.List;
+
+public class PanelCliente extends JFrame {
+    private Usuario cliente;
+    private JTable tablaZapatillas;
+    private DefaultTableModel modeloTabla;
+    private ZapatillaController zapatillaController = new ZapatillaController();
+    private CompraController compraController = new CompraController();
+    private JScrollPane scrollPaneTabla;
+
+    public PanelCliente(Usuario cliente) {
+        this.cliente = cliente;
+        setTitle("Panel del Cliente");
+        setSize(800, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        Color fondoAzulCielo = new Color(0xE3F2FD);
+        Color azulBoton = new Color(0x64B5F6);
+        Color azulHover = new Color(0x42A5F5);
+        Color textoAzulOscuro = new Color(0x0D47A1);
+        Color bordeSuave = new Color(0xBBDEFB);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panel.setBackground(fondoAzulCielo);
+
+        JLabel lblTitulo = new JLabel("Bienvenido, " + cliente.getNombreUsuario(), JLabel.CENTER);
+        lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
+        lblTitulo.setForeground(textoAzulOscuro);
+        lblTitulo.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(lblTitulo);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        JPanel panelBotones = new JPanel(new GridLayout(2, 2, 15, 15));
+        panelBotones.setBackground(fondoAzulCielo);
+
+        JButton btnVerZapatillas = crearBoton("Ver Zapatillas", azulBoton, azulHover, Color.WHITE);
+        JButton btnMisCompras = crearBoton("Mis Compras", azulBoton, azulHover, Color.WHITE);
+        JButton btnMiCuenta = crearBoton("Mi Cuenta", azulBoton, azulHover, Color.WHITE);
+        JButton btnCerrarSesion = crearBoton("Cerrar Sesión", azulBoton, azulHover, Color.WHITE);
+
+        panelBotones.add(btnVerZapatillas);
+        panelBotones.add(btnMisCompras);
+        panelBotones.add(btnMiCuenta);
+        panelBotones.add(btnCerrarSesion);
+        panel.add(panelBotones);
+        panel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        modeloTabla = new DefaultTableModel(new String[]{"ID", "Modelo", "Marca", "Precio", "Stock", "Talla"}, 0);
+        tablaZapatillas = new JTable(modeloTabla);
+        scrollPaneTabla = new JScrollPane(tablaZapatillas);
+        scrollPaneTabla.setVisible(false);
+        scrollPaneTabla.setPreferredSize(new Dimension(750, 200));
+        scrollPaneTabla.setBackground(bordeSuave);
+        panel.add(scrollPaneTabla);
+
+        // Acción: cerrar sesión
+        btnCerrarSesion.addActionListener(e -> {
+            dispose();
+            new PantallaInicio().setVisible(true);
+        });
+
+        // Acción: ver zapatillas
+        btnVerZapatillas.addActionListener(e -> {
+            if (!scrollPaneTabla.isVisible()) {
+                cargarZapatillas();
+                scrollPaneTabla.setVisible(true);
+                btnVerZapatillas.setText("Ocultar Zapatillas");
+            } else {
+                scrollPaneTabla.setVisible(false);
+                btnVerZapatillas.setText("Ver Zapatillas");
+            }
+            revalidate();
+        });
+
+        // Acción: mis compras
+        btnMisCompras.addActionListener(e -> JOptionPane.showMessageDialog(this, "Aquí iría el historial de compras (pendiente)"));
+
+        // Acción: mi cuenta → REGISTRAR COMPRA DESDE TABLA
+        btnMiCuenta.addActionListener(e -> JOptionPane.showMessageDialog(this, "Aquí irían los datos del usuario (pendiente)"));
+
+        // Acción: doble clic en fila para registrar compra
+        tablaZapatillas.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
+                int fila = tablaZapatillas.rowAtPoint(e.getPoint());
+                if (fila >= 0) {
+                    try {
+                        int idZapatilla = (int) modeloTabla.getValueAt(fila, 0);
+                        String modelo = (String) modeloTabla.getValueAt(fila, 1);
+                        float precio = Float.parseFloat(modeloTabla.getValueAt(fila, 3).toString());
+                        int stock = Integer.parseInt(modeloTabla.getValueAt(fila, 4).toString());
+
+                        String input = JOptionPane.showInputDialog(PanelCliente.this,
+                                "¿Cuántas unidades de \"" + modelo + "\" deseas comprar?",
+                                "Registrar Compra", JOptionPane.QUESTION_MESSAGE);
+
+                        if (input == null || input.trim().isEmpty()) return; // Cancelado
+
+                        int cantidad = Integer.parseInt(input.trim());
+
+                        if (cantidad <= 0) {
+                            JOptionPane.showMessageDialog(PanelCliente.this, "La cantidad debe ser mayor que 0.");
+                            return;
+                        }
+
+                        if (cantidad > stock) {
+                            JOptionPane.showMessageDialog(PanelCliente.this, "No hay suficiente stock.");
+                            return;
+                        }
+
+                        double total = cantidad * precio;
+                        Date fecha = new Date(System.currentTimeMillis());
+
+                        // Usar directamente los parámetros en lugar de crear objeto Compra
+                        if (compraController.registrarCompra(cliente.getIdUsuario(), idZapatilla, fecha, cantidad, total)) {
+                            JOptionPane.showMessageDialog(PanelCliente.this, "✅ Compra registrada correctamente. Total: " + total + " €");
+                            cargarZapatillas(); // refrescar tabla
+                        } else {
+                            JOptionPane.showMessageDialog(PanelCliente.this, "❌ Error al registrar la compra.");
+                        }
+
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(PanelCliente.this, "Por favor, introduce un número válido.");
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        JOptionPane.showMessageDialog(PanelCliente.this, "Ocurrió un error inesperado.");
+                    }
+                }
+            }
+        });
+
+        add(panel);
+    }
+
+    private void cargarZapatillas() {
+        modeloTabla.setRowCount(0);
+        List<Zapatilla> lista = zapatillaController.obtenerTodas();
+        for (Zapatilla z : lista) {
+            modeloTabla.addRow(new Object[]{
+                    z.getIdZapatilla(), z.getModelo(), z.getMarca(), z.getPrecio(), z.getStock(), z.getTalla()
+            });
+        }
+    }
+
+    private JButton crearBoton(String texto, Color colorFondo, Color colorHover, Color colorTexto) {
+        JButton boton = new JButton(texto);
+        boton.setBackground(colorFondo);
+        boton.setForeground(colorTexto);
+        boton.setFocusPainted(false);
+        boton.setFont(new Font("Arial", Font.BOLD, 14));
+        boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 1));
+        boton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        boton.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent evt) {
+                boton.setBackground(colorHover);
+            }
+
+            public void mouseExited(MouseEvent evt) {
+                boton.setBackground(colorFondo);
+            }
+        });
+
+        return boton;
+    }
+}

@@ -10,34 +10,18 @@ public class ConexionBD {
     private static final String CONTRASEÑA = "";
     private static final String DRIVER = "com.mysql.cj.jdbc.Driver";
 
-    private static Connection conexion;
-
-    public static Connection obtenerConexion() {
-        if (conexion == null) {
-            try {
-                Class.forName(DRIVER); // Cargar el driver de MySQL
-                conexion = DriverManager.getConnection(URL, USUARIO, CONTRASEÑA);
-                System.out.println("✅ Conexión establecida con la base de datos.");
-            } catch (ClassNotFoundException e) {
-                System.err.println("❌ No se encontró el driver de MySQL.");
-                e.printStackTrace();
-            } catch (SQLException e) {
-                System.err.println("❌ Error al conectar con la base de datos.");
-                e.printStackTrace();
-            }
+    static {
+        try {
+            Class.forName(DRIVER); // Cargar el driver una vez al iniciar la clase
+            System.out.println("✅ Driver MySQL cargado correctamente.");
+        } catch (ClassNotFoundException e) {
+            System.err.println("❌ No se encontró el driver de MySQL.");
+            e.printStackTrace();
         }
-        return conexion;
     }
 
-    public static void cerrarConexion() {
-        if (conexion != null) {
-            try {
-                conexion.close();
-                System.out.println("🔒 Conexión cerrada.");
-            } catch (SQLException e) {
-                System.err.println("❌ Error al cerrar la conexión.");
-                e.printStackTrace();
-            }
-        }
+    public static Connection obtenerConexion() throws SQLException {
+        // Devuelve una nueva conexión cada vez que se llama
+        return DriverManager.getConnection(URL, USUARIO, CONTRASEÑA);
     }
 }

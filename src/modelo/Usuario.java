@@ -5,16 +5,22 @@ public class Usuario {
     private String nombreUsuario;
     private String contraseña;
     private String rol; // "admin" o "cliente"
+    private String nombre;   // Nombre completo
+    private String email;
+    private String telefono;
 
-    public Usuario(int idUsuario, String nombreUsuario, String contraseña, String rol) {
+    public Usuario(int idUsuario, String nombreUsuario, String contraseña, String rol, String nombre, String email, String telefono) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
         this.contraseña = contraseña;
         this.rol = rol;
+        this.nombre = nombre;
+        this.email = email;
+        this.telefono = telefono;
     }
 
-    public Usuario(String nombreUsuario, String contraseña, String rol) {
-        this(0, nombreUsuario, contraseña, rol);
+    public Usuario() {
+
     }
 
     public int getIdUsuario() {
@@ -47,6 +53,30 @@ public class Usuario {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
     }
 
     @Override

@@ -10,26 +10,27 @@ import java.util.List;
 public class CompraController implements ICompraController {
 
     @Override
-    public boolean registrarCompra(Compra compra) {
-        String sql = "INSERT INTO compras (id_cliente, id_zapatilla, fecha_compra, cantidad, total) VALUES (?, ?, ?, ?, ?)";
-
+    public boolean registrarCompra(int idUsuario, int idZapatilla, Date fechaCompra, int cantidad, double total) {
+        String sql = "INSERT INTO compras (id_usuario, id_zapatilla, fecha_compra, cantidad, total) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, compra.getIdCliente());
-            stmt.setInt(2, compra.getIdZapatilla());
-            stmt.setDate(3, compra.getFechaCompra());
-            stmt.setInt(4, compra.getCantidad());
-            stmt.setDouble(5, compra.getTotal());
+            stmt.setInt(1, idUsuario);
+            stmt.setInt(2, idZapatilla);
+            stmt.setDate(3, new java.sql.Date(fechaCompra.getTime()));
+            stmt.setInt(4, cantidad);
+            stmt.setDouble(5, total);
 
-            return stmt.executeUpdate() > 0;
+            int filas = stmt.executeUpdate();
+
+            return filas > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
         return false;
     }
+
 
     @Override
     public List<Compra> obtenerComprasPorCliente(int idCliente) {
