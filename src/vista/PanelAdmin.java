@@ -26,8 +26,8 @@ public class PanelAdmin extends JFrame {
 
         // Centro: botones de acciones administrativas
         JPanel centro = new JPanel(new GridLayout(2, 2, 10, 10));
-        JButton btnGestionUsuarios = new JButton("Gestionar Usuarios");
-        JButton btnGestionZapatillas = new JButton("Gestionar Zapatillas");
+        JButton btnGestionUsuarios = new JButton("Editar Zapatillas");
+        JButton btnGestionZapatillas = new JButton("Añadir/Eliminar Zapatillas");
         JButton btnVerCompras = new JButton("Ver Compras");
         JButton btnCerrarSesion = new JButton("Cerrar Sesión");
 

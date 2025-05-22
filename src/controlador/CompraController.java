@@ -35,7 +35,10 @@ public class CompraController implements ICompraController {
     @Override
     public List<Compra> obtenerComprasPorCliente(int idCliente) {
         List<Compra> compras = new ArrayList<>();
-        String sql = "SELECT * FROM compras WHERE id_cliente = ?";
+        String sql = "SELECT c.id_compra, c.fecha_compra, c.cantidad, c.total, z.modelo " +
+                "FROM compras c " +
+                "JOIN zapatillas z ON c.id_zapatilla = z.id_zapatilla " +
+                "WHERE c.id_usuario = ?";
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -44,15 +47,13 @@ public class CompraController implements ICompraController {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                Compra c = new Compra(
-                        rs.getInt("id_compra"),
-                        rs.getInt("id_cliente"),
-                        rs.getInt("id_zapatilla"),
-                        rs.getDate("fecha_compra"),
-                        rs.getInt("cantidad"),
-                        rs.getDouble("total")
-                );
-                compras.add(c);
+                Compra compra = new Compra();
+                compra.setFechaCompra(rs.getDate("fecha_compra"));
+                compra.setCantidad(rs.getInt("cantidad"));
+                compra.setTotal(rs.getDouble("total"));
+                compra.setModeloZapatilla(rs.getString("modelo")); // nuevo campo
+
+                compras.add(compra);
             }
 
         } catch (SQLException e) {
@@ -61,6 +62,7 @@ public class CompraController implements ICompraController {
 
         return compras;
     }
+
 
     @Override
     public List<Compra> obtenerTodasLasCompras() {

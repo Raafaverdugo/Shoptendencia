@@ -10,6 +10,9 @@ public class Compra {
     private int cantidad;
     private double total;
 
+    // NUEVO CAMPO para el nombre/modelo de la zapatilla
+    private String modeloZapatilla;
+
     public Compra(int idCompra, int idCliente, int idZapatilla, Date fechaCompra, int cantidad, double total) {
         this.idCompra = idCompra;
         this.idCliente = idCliente;
@@ -24,7 +27,6 @@ public class Compra {
     }
 
     public Compra() {
-
     }
 
     public int getIdCompra() {
@@ -75,8 +77,17 @@ public class Compra {
         this.total = total;
     }
 
+    public String getModeloZapatilla() {
+        return modeloZapatilla;
+    }
+
+    public void setModeloZapatilla(String modeloZapatilla) {
+        this.modeloZapatilla = modeloZapatilla;
+    }
+
     @Override
     public String toString() {
-        return "Compra #" + idCompra + " - Cliente " + idCliente + " - Zapatilla " + idZapatilla;
+        return "Zapatilla: " + modeloZapatilla + ", Fecha: " + fechaCompra +
+                ", Cantidad: " + cantidad + ", Total: $" + total;
     }
 }

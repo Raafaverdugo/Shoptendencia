@@ -2,6 +2,7 @@ package vista;
 
 import controlador.CompraController;
 import controlador.ZapatillaController;
+import modelo.Compra;
 import modelo.Usuario;
 import modelo.Zapatilla;
 
@@ -87,17 +88,51 @@ public class PanelCliente extends JFrame {
             revalidate();
         });
 
-        // Acción: mis compras
-        btnMisCompras.addActionListener(e -> JOptionPane.showMessageDialog(this, "Aquí iría el historial de compras (pendiente)"));
+        // Acción: mis compras → muestra historial de compras simplificado
+        btnMisCompras.addActionListener(e -> {
+            List<Compra> compras = compraController.obtenerComprasPorCliente(cliente.getIdUsuario());
 
-        // Acción: mi cuenta → REGISTRAR COMPRA DESDE TABLA
-        btnMiCuenta.addActionListener(e -> JOptionPane.showMessageDialog(this, "Aquí irían los datos del usuario (pendiente)"));
+            if (compras.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No tienes compras registradas.");
+                return;
+            }
 
-        // Acción: doble clic en fila para registrar compra
+            String[] columnas = {"Modelo", "Fecha", "Cantidad", "Total"};
+            Object[][] datos = new Object[compras.size()][columnas.length];
+
+            for (int i = 0; i < compras.size(); i++) {
+                Compra c = compras.get(i);
+                datos[i][0] = c.getModeloZapatilla();  // nombre/modelo de la zapatilla
+                datos[i][1] = c.getFechaCompra();
+                datos[i][2] = c.getCantidad();
+                datos[i][3] = c.getTotal();
+            }
+
+            JTable tablaCompras = new JTable(datos, columnas);
+            JScrollPane scrollPane = new JScrollPane(tablaCompras);
+            scrollPane.setPreferredSize(new Dimension(600, 300));
+
+            JOptionPane.showMessageDialog(this, scrollPane, "Historial de Compras", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        // Acción: mi cuenta
+
+        btnMiCuenta.addActionListener(e -> {
+            String infoUsuario = "Nombre de usuario: " + cliente.getNombreUsuario() + "\n" +
+                    "Nombre: " + cliente.getNombre() + "\n" +
+                    "Email: " + cliente.getEmail() + "\n" +
+                    "Teléfono: " + cliente.getTelefono() + "\n" +
+                    "Rol: " + cliente.getRol();
+
+            JOptionPane.showMessageDialog(this, infoUsuario, "Datos del usuario", JOptionPane.INFORMATION_MESSAGE);
+        });
+
+
+        // Acción: clic en fila para registrar compra
         tablaZapatillas.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tablaZapatillas.rowAtPoint(e.getPoint());
-                if (fila >= 0) {
+                if (fila >= 0 && e.getClickCount() == 1) { // doble clic
                     try {
                         int idZapatilla = (int) modeloTabla.getValueAt(fila, 0);
                         String modelo = (String) modeloTabla.getValueAt(fila, 1);
@@ -125,7 +160,6 @@ public class PanelCliente extends JFrame {
                         double total = cantidad * precio;
                         Date fecha = new Date(System.currentTimeMillis());
 
-                        // Usar directamente los parámetros en lugar de crear objeto Compra
                         if (compraController.registrarCompra(cliente.getIdUsuario(), idZapatilla, fecha, cantidad, total)) {
                             JOptionPane.showMessageDialog(PanelCliente.this, "✅ Compra registrada correctamente. Total: " + total + " €");
                             cargarZapatillas(); // refrescar tabla

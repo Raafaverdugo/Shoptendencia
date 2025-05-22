@@ -44,6 +44,8 @@ public class UsuarioController implements IUsuarioController {
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+            System.out.println("🔍 ¿Autocommit activo?: " + conn.getAutoCommit());
+
             stmt.setString(1, nuevo.getNombreUsuario());
             stmt.setString(2, nuevo.getContraseña());
             stmt.setString(3, nuevo.getRol());
@@ -58,14 +60,17 @@ public class UsuarioController implements IUsuarioController {
                 if (rs.next()) {
                     int idGenerado = rs.getInt(1);
                     nuevo.setIdUsuario(idGenerado);
+                    System.out.println("✅ Usuario insertado con ID: " + idGenerado);
                     return nuevo;
                 }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
+
 
 
 
