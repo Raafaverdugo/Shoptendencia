@@ -20,6 +20,7 @@ public class PanelCliente extends JFrame {
     private ZapatillaController zapatillaController = new ZapatillaController();
     private CompraController compraController = new CompraController();
     private JScrollPane scrollPaneTabla;
+    private JLabel lblMensajeCompra;
 
     public PanelCliente(Usuario cliente) {
         this.cliente = cliente;
@@ -61,13 +62,20 @@ public class PanelCliente extends JFrame {
         panel.add(panelBotones);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        modeloTabla = new DefaultTableModel(new String[]{"ID", "Modelo", "Marca", "Precio", "Stock", "Talla"}, 0);
+        modeloTabla = new DefaultTableModel(new String[]{"ID", "Marca", "Modelo", "Talla", "Precio", "Stock"}, 0);
         tablaZapatillas = new JTable(modeloTabla);
         scrollPaneTabla = new JScrollPane(tablaZapatillas);
         scrollPaneTabla.setVisible(false);
         scrollPaneTabla.setPreferredSize(new Dimension(750, 200));
         scrollPaneTabla.setBackground(bordeSuave);
         panel.add(scrollPaneTabla);
+
+        lblMensajeCompra = new JLabel("Haz clic en una zapatilla para comprar");
+        lblMensajeCompra.setForeground(textoAzulOscuro);
+        lblMensajeCompra.setFont(new Font("Arial", Font.ITALIC, 14));
+        lblMensajeCompra.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblMensajeCompra.setVisible(false);
+        panel.add(lblMensajeCompra);
 
         // Acción: cerrar sesión
         btnCerrarSesion.addActionListener(e -> {
@@ -80,9 +88,11 @@ public class PanelCliente extends JFrame {
             if (!scrollPaneTabla.isVisible()) {
                 cargarZapatillas();
                 scrollPaneTabla.setVisible(true);
+                lblMensajeCompra.setVisible(true);
                 btnVerZapatillas.setText("Ocultar Zapatillas");
             } else {
                 scrollPaneTabla.setVisible(false);
+                lblMensajeCompra.setVisible(false);
                 btnVerZapatillas.setText("Ver Zapatillas");
             }
             revalidate();
@@ -102,7 +112,7 @@ public class PanelCliente extends JFrame {
 
             for (int i = 0; i < compras.size(); i++) {
                 Compra c = compras.get(i);
-                datos[i][0] = c.getModeloZapatilla();  // nombre/modelo de la zapatilla
+                datos[i][0] = c.getModeloZapatilla();
                 datos[i][1] = c.getFechaCompra();
                 datos[i][2] = c.getCantidad();
                 datos[i][3] = c.getTotal();
@@ -116,7 +126,6 @@ public class PanelCliente extends JFrame {
         });
 
         // Acción: mi cuenta
-
         btnMiCuenta.addActionListener(e -> {
             String infoUsuario = "Nombre de usuario: " + cliente.getNombreUsuario() + "\n" +
                     "Nombre: " + cliente.getNombre() + "\n" +
@@ -127,23 +136,24 @@ public class PanelCliente extends JFrame {
             JOptionPane.showMessageDialog(this, infoUsuario, "Datos del usuario", JOptionPane.INFORMATION_MESSAGE);
         });
 
-
         // Acción: clic en fila para registrar compra
         tablaZapatillas.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tablaZapatillas.rowAtPoint(e.getPoint());
-                if (fila >= 0 && e.getClickCount() == 1) { // doble clic
+                if (fila >= 0 && e.getClickCount() == 1) {
                     try {
                         int idZapatilla = (int) modeloTabla.getValueAt(fila, 0);
-                        String modelo = (String) modeloTabla.getValueAt(fila, 1);
-                        float precio = Float.parseFloat(modeloTabla.getValueAt(fila, 3).toString());
-                        int stock = Integer.parseInt(modeloTabla.getValueAt(fila, 4).toString());
+                        String marca = (String) modeloTabla.getValueAt(fila, 1);
+                        String modelo = (String) modeloTabla.getValueAt(fila, 2);
+                        float talla = Float.parseFloat(modeloTabla.getValueAt(fila, 3).toString());
+                        float precio = Float.parseFloat(modeloTabla.getValueAt(fila, 4).toString());
+                        int stock = Integer.parseInt(modeloTabla.getValueAt(fila, 5).toString());
 
                         String input = JOptionPane.showInputDialog(PanelCliente.this,
-                                "¿Cuántas unidades de \"" + modelo + "\" deseas comprar?",
+                                "¿Cuántas unidades de \"" + marca + " " + modelo + " (talla " + talla + ")\" deseas comprar?",
                                 "Registrar Compra", JOptionPane.QUESTION_MESSAGE);
 
-                        if (input == null || input.trim().isEmpty()) return; // Cancelado
+                        if (input == null || input.trim().isEmpty()) return;
 
                         int cantidad = Integer.parseInt(input.trim());
 
@@ -162,7 +172,7 @@ public class PanelCliente extends JFrame {
 
                         if (compraController.registrarCompra(cliente.getIdUsuario(), idZapatilla, fecha, cantidad, total)) {
                             JOptionPane.showMessageDialog(PanelCliente.this, "✅ Compra registrada correctamente. Total: " + total + " €");
-                            cargarZapatillas(); // refrescar tabla
+                            cargarZapatillas();
                         } else {
                             JOptionPane.showMessageDialog(PanelCliente.this, "❌ Error al registrar la compra.");
                         }
@@ -185,7 +195,7 @@ public class PanelCliente extends JFrame {
         List<Zapatilla> lista = zapatillaController.obtenerTodas();
         for (Zapatilla z : lista) {
             modeloTabla.addRow(new Object[]{
-                    z.getIdZapatilla(), z.getModelo(), z.getMarca(), z.getPrecio(), z.getStock(), z.getTalla()
+                    z.getIdZapatilla(), z.getMarca(), z.getModelo(), z.getTalla(), z.getPrecio(), z.getStock()
             });
         }
     }

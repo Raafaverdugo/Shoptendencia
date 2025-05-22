@@ -21,11 +21,11 @@ public class ZapatillaController implements IZapatillaController {
             while (rs.next()) {
                 Zapatilla z = new Zapatilla(
                         rs.getInt("id_zapatilla"),
-                        rs.getString("modelo"),
                         rs.getString("marca"),
+                        rs.getString("modelo"),
+                        rs.getFloat("talla"),
                         rs.getFloat("precio"),
-                        rs.getInt("stock"),
-                        rs.getInt("talla")
+                        rs.getInt("stock")
                 );
                 lista.add(z);
             }
@@ -51,11 +51,11 @@ public class ZapatillaController implements IZapatillaController {
             if (rs.next()) {
                 z = new Zapatilla(
                         rs.getInt("id_zapatilla"),
-                        rs.getString("modelo"),
                         rs.getString("marca"),
+                        rs.getString("modelo"),
+                        rs.getFloat("talla"),
                         rs.getFloat("precio"),
-                        rs.getInt("stock"),
-                        rs.getInt("talla")
+                        rs.getInt("stock")
                 );
             }
 
@@ -68,16 +68,16 @@ public class ZapatillaController implements IZapatillaController {
 
     @Override
     public boolean agregarZapatilla(Zapatilla z) {
-        String sql = "INSERT INTO zapatillas (modelo, marca, precio, stock, talla) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO zapatillas (marca, modelo, talla, precio, stock) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, z.getModelo());
-            stmt.setString(2, z.getMarca());
-            stmt.setDouble(3, z.getPrecio());
-            stmt.setInt(4, z.getStock());
-            stmt.setFloat(5, z.getTalla());
+            stmt.setString(1, z.getMarca());
+            stmt.setString(2, z.getModelo());
+            stmt.setFloat(3, z.getTalla());
+            stmt.setDouble(4, z.getPrecio());
+            stmt.setInt(5, z.getStock());
 
             return stmt.executeUpdate() > 0;
 
@@ -90,16 +90,16 @@ public class ZapatillaController implements IZapatillaController {
 
     @Override
     public boolean actualizarZapatilla(Zapatilla z) {
-        String sql = "UPDATE zapatillas SET modelo = ?, marca = ?, precio = ?, stock = ?, talla = ? WHERE id_zapatilla = ?";
+        String sql = "UPDATE zapatillas SET marca = ?, modelo = ?, talla = ?, precio = ?, stock = ? WHERE id_zapatilla = ?";
 
         try (Connection conn = ConexionBD.obtenerConexion();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, z.getModelo());
-            stmt.setString(2, z.getMarca());
-            stmt.setDouble(3, z.getPrecio());
-            stmt.setInt(4, z.getStock());
-            stmt.setFloat(5, z.getTalla());
+            stmt.setString(1, z.getMarca());
+            stmt.setString(2, z.getModelo());
+            stmt.setFloat(3, z.getTalla());
+            stmt.setDouble(4, z.getPrecio());
+            stmt.setInt(5, z.getStock());
             stmt.setInt(6, z.getIdZapatilla());
 
             return stmt.executeUpdate() > 0;

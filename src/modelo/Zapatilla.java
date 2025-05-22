@@ -21,6 +21,10 @@ public class Zapatilla {
         this(0, marca, modelo, talla, precio, stock);
     }
 
+    public Zapatilla() {
+
+    }
+
     public int getIdZapatilla() {
         return idZapatilla;
     }
