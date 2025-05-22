@@ -17,6 +17,7 @@ public class PantallaInicio extends JFrame {
     private UsuarioController usuarioController = new UsuarioController();
 
     public PantallaInicio() {
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("../resources/Logo.jpg")));
         setTitle("ShopTendencia - Inicio");
         setSize(450, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

@@ -17,12 +17,7 @@ public class Zapatilla {
         this.stock = stock;
     }
 
-    public Zapatilla(String marca, String modelo, float talla, double precio, int stock) {
-        this(0, marca, modelo, talla, precio, stock);
-    }
-
     public Zapatilla() {
-
     }
 
     public int getIdZapatilla() {

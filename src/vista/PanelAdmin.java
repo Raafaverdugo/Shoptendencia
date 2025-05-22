@@ -16,15 +16,17 @@ public class PanelAdmin extends JFrame {
     private DefaultTableModel modeloTabla;
     private JScrollPane scrollPaneTabla;
     private ZapatillaController zapatillaController = new ZapatillaController();
+    private JLabel lblMensaje;
+    private boolean modoEdicion = false;
 
     public PanelAdmin(Usuario admin) {
         this.admin = admin;
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("../resources/Logo.jpg")));
         setTitle("Panel de Administración");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        // Paleta de colores (azul claro para admin)
         Color fondoAzulAdmin = new Color(0xE1F5FE);
         Color azulBotonAdmin = new Color(0x0288D1);
         Color azulHoverAdmin = new Color(0x0277BD);
@@ -66,25 +68,54 @@ public class PanelAdmin extends JFrame {
         scrollPaneTabla.setBackground(bordeSuaveAdmin);
         panel.add(scrollPaneTabla);
 
+        // Etiqueta de mensaje
+        lblMensaje = new JLabel("Haz clic para editar una zapatilla");
+        lblMensaje.setFont(new Font("Arial", Font.ITALIC, 14));
+        lblMensaje.setForeground(textoAzulOscuroAdmin);
+        lblMensaje.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblMensaje.setVisible(false);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+        panel.add(lblMensaje);
+
         // Acción: ver zapatillas
         btnVerZapatillas.addActionListener(e -> {
+            modoEdicion = false;
+            lblMensaje.setVisible(false);
             if (!scrollPaneTabla.isVisible()) {
                 cargarZapatillas();
                 scrollPaneTabla.setVisible(true);
                 btnVerZapatillas.setText("Ocultar Zapatillas");
+                btnEditarZapatillas.setText("Editar Zapatillas");
             } else {
                 scrollPaneTabla.setVisible(false);
+                btnVerZapatillas.setText("Ver Zapatillas");
+                btnEditarZapatillas.setText("Editar Zapatillas");
+            }
+            revalidate();
+        });
+
+        // Acción: editar zapatillas o retroceder
+        btnEditarZapatillas.addActionListener(e -> {
+            if (!modoEdicion) {
+                // Entrar en modo edición
+                modoEdicion = true;
+                cargarZapatillas();
+                scrollPaneTabla.setVisible(true);
+                lblMensaje.setText("Haz clic para editar una zapatilla");
+                lblMensaje.setVisible(true);
+                btnEditarZapatillas.setText("Ocultar Zapatillas");
+                btnVerZapatillas.setText("Ver Zapatillas");
+            } else {
+                // Salir de modo edición
+                modoEdicion = false;
+                scrollPaneTabla.setVisible(false);
+                lblMensaje.setVisible(false);
+                btnEditarZapatillas.setText("Editar Zapatillas");
                 btnVerZapatillas.setText("Ver Zapatillas");
             }
             revalidate();
         });
 
-        // Acción: editar zapatillas (muestra tabla, clic para editar)
-        btnEditarZapatillas.addActionListener(e -> {
-            cargarZapatillas();
-            scrollPaneTabla.setVisible(true);
-            revalidate();
-        });
 
         // Acción: cerrar sesión
         btnCerrarSesion.addActionListener(e -> {
@@ -92,10 +123,10 @@ public class PanelAdmin extends JFrame {
             new PantallaInicio().setVisible(true);
         });
 
-        // Clic para editar
+        // Clic para editar (solo si está en modo edición)
         tablaZapatillas.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 1 && tablaZapatillas.getSelectedRow() != -1) {
+                if (modoEdicion && e.getClickCount() == 1 && tablaZapatillas.getSelectedRow() != -1) {
                     int fila = tablaZapatillas.getSelectedRow();
                     int idZapatilla = (int) modeloTabla.getValueAt(fila, 0);
                     Zapatilla z = zapatillaController.buscarPorId(idZapatilla);
@@ -108,8 +139,25 @@ public class PanelAdmin extends JFrame {
             }
         });
 
-        // Botón aún sin implementar
-        btnGestionZapatillas.addActionListener(e -> JOptionPane.showMessageDialog(this, "Función para gestionar zapatillas (pendiente)"));
+        btnGestionZapatillas.addActionListener(e -> {
+            String[] opciones = {"Agregar Zapatilla", "Eliminar Zapatilla", "Cancelar"};
+            int eleccion = JOptionPane.showOptionDialog(
+                    this,
+                    "¿Qué deseas hacer?",
+                    "Gestión de Zapatillas",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    opciones,
+                    opciones[0]
+            );
+
+            if (eleccion == 0) {
+                mostrarDialogoAgregar();
+            } else if (eleccion == 1) {
+                mostrarDialogoEliminar();
+            }
+        });
 
         add(panel);
     }
@@ -185,4 +233,91 @@ public class PanelAdmin extends JFrame {
             }
         }
     }
+    private void mostrarDialogoAgregar() {
+        JTextField txtMarca = new JTextField();
+        JTextField txtModelo = new JTextField();
+        JTextField txtTalla = new JTextField();
+        JTextField txtPrecio = new JTextField();
+        JTextField txtStock = new JTextField();
+
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        panel.add(new JLabel("Marca:"));
+        panel.add(txtMarca);
+        panel.add(new JLabel("Modelo:"));
+        panel.add(txtModelo);
+        panel.add(new JLabel("Talla:"));
+        panel.add(txtTalla);
+        panel.add(new JLabel("Precio:"));
+        panel.add(txtPrecio);
+        panel.add(new JLabel("Stock:"));
+        panel.add(txtStock);
+
+        int resultado = JOptionPane.showConfirmDialog(this, panel, "Agregar Nueva Zapatilla", JOptionPane.OK_CANCEL_OPTION);
+        if (resultado == JOptionPane.OK_OPTION) {
+            try {
+                Zapatilla nueva = new Zapatilla();
+                nueva.setMarca(txtMarca.getText());
+                nueva.setModelo(txtModelo.getText());
+                nueva.setTalla(Float.parseFloat(txtTalla.getText()));
+                nueva.setPrecio(Float.parseFloat(txtPrecio.getText()));
+                nueva.setStock(Integer.parseInt(txtStock.getText()));
+
+                if (zapatillaController.agregarZapatilla(nueva)) {
+                    JOptionPane.showMessageDialog(this, "Zapatilla agregada correctamente.");
+                    cargarZapatillas();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error al agregar la zapatilla.");
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Verifica los datos numéricos.");
+            }
+        }
+    }
+
+    private void mostrarDialogoEliminar() {
+        // Crear tabla con zapatillas
+        List<Zapatilla> lista = zapatillaController.obtenerTodas();
+
+        String[] columnas = {"ID", "Marca", "Modelo", "Talla", "Precio", "Stock"};
+        Object[][] datos = new Object[lista.size()][6];
+        for (int i = 0; i < lista.size(); i++) {
+            Zapatilla z = lista.get(i);
+            datos[i][0] = z.getIdZapatilla();
+            datos[i][1] = z.getMarca();
+            datos[i][2] = z.getModelo();
+            datos[i][3] = z.getTalla();
+            datos[i][4] = z.getPrecio();
+            datos[i][5] = z.getStock();
+        }
+
+        JTable tabla = new JTable(datos, columnas);
+        JScrollPane scrollPane = new JScrollPane(tabla);
+        tabla.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tabla.setPreferredScrollableViewportSize(new Dimension(600, 200));
+
+        int opcion = JOptionPane.showConfirmDialog(this, scrollPane, "Selecciona una zapatilla para eliminar", JOptionPane.OK_CANCEL_OPTION);
+
+        if (opcion == JOptionPane.OK_OPTION && tabla.getSelectedRow() != -1) {
+            int filaSeleccionada = tabla.getSelectedRow();
+            int id = (int) tabla.getValueAt(filaSeleccionada, 0);
+
+            int confirmacion = JOptionPane.showConfirmDialog(this,
+                    "¿Estás seguro de eliminar la zapatilla con ID " + id + "?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirmacion == JOptionPane.YES_OPTION) {
+                if (zapatillaController.eliminarZapatilla(id)) {
+                    JOptionPane.showMessageDialog(this, "Zapatilla eliminada correctamente.");
+                    cargarZapatillas(); // Refresca la tabla principal
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se pudo eliminar la zapatilla.");
+                }
+            }
+        } else if (tabla.getSelectedRow() == -1) {
+            JOptionPane.showMessageDialog(this, "Debes seleccionar una zapatilla para eliminar.");
+        }
+    }
+
+
 }

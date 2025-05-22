@@ -8,7 +8,6 @@ import java.util.List;
 public interface ICompraController {
     boolean registrarCompra(int idUsuario, int idZapatilla, Date fechaCompra, int cantidad, double total);
     List<Compra> obtenerComprasPorCliente(int idCliente);
-    List<Compra> obtenerTodasLasCompras(); // Solo para admin
-    double calcularTotalGastadoPorCliente(int idCliente);
+    List<Compra> obtenerTodasLasCompras();
     double calcularIngresosTotales();
 }

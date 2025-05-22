@@ -24,7 +24,8 @@ public class PanelCliente extends JFrame {
 
     public PanelCliente(Usuario cliente) {
         this.cliente = cliente;
-        setTitle("Panel del Cliente");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("../resources/Logo.jpg")));
+        setTitle("Shoptendencia");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);

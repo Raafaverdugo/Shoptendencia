@@ -70,25 +70,4 @@ public class UsuarioController implements IUsuarioController {
         }
         return null;
     }
-
-
-
-
-    private boolean existeUsuario(String nombreUsuario) {
-        String sql = "SELECT id_usuario FROM usuarios WHERE nombre_usuario = ?";
-
-        try (Connection conn = ConexionBD.obtenerConexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, nombreUsuario);
-
-            ResultSet rs = stmt.executeQuery();
-            return rs.next();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
 }

@@ -9,8 +9,6 @@ public class Compra {
     private Date fechaCompra;
     private int cantidad;
     private double total;
-
-    // NUEVO CAMPO para el nombre/modelo de la zapatilla
     private String modeloZapatilla;
 
     public Compra(int idCompra, int idCliente, int idZapatilla, Date fechaCompra, int cantidad, double total) {
@@ -20,10 +18,6 @@ public class Compra {
         this.fechaCompra = fechaCompra;
         this.cantidad = cantidad;
         this.total = total;
-    }
-
-    public Compra(int idCliente, int idZapatilla, Date fechaCompra, int cantidad, double total) {
-        this(0, idCliente, idZapatilla, fechaCompra, cantidad, total);
     }
 
     public Compra() {

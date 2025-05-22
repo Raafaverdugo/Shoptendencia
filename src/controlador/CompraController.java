@@ -92,27 +92,6 @@ public class CompraController implements ICompraController {
         return compras;
     }
 
-    @Override
-    public double calcularTotalGastadoPorCliente(int idCliente) {
-        double total = 0.0;
-        String sql = "SELECT SUM(total) AS total FROM compras WHERE id_cliente = ?";
-
-        try (Connection conn = ConexionBD.obtenerConexion();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setInt(1, idCliente);
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                total = rs.getDouble("total");
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return total;
-    }
 
     @Override
     public double calcularIngresosTotales() {
