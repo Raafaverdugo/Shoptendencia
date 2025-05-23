@@ -9,31 +9,38 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class PantallaInicio extends JFrame {
+    // Campos para el formulario de login/registro
     private JTextField txtUsuario;
     private JPasswordField txtContraseña;
     private JTextField txtNombre;
     private JTextField txtEmail;
     private JTextField txtTelefono;
+
+    // Controlador para manejar lógica de usuarios
     private UsuarioController usuarioController = new UsuarioController();
 
     public PantallaInicio() {
+        // Configuración básica de la ventana
         setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("../resources/Logo.jpg")));
         setTitle("ShopTendencia - Inicio");
         setSize(450, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Definición de colores personalizados
         Color azulCielo = new Color(135, 206, 235);
         Color azulClaro = new Color(173, 216, 230);
 
+        // Panel principal con layout flexible
         JPanel panel = new JPanel();
         panel.setBackground(azulCielo);
         panel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(8, 8, 8, 8); // Espaciado entre componentes
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Título de bienvenida
         JLabel lblTitulo = new JLabel("Bienvenido a ShopTendencia");
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 18));
         lblTitulo.setForeground(Color.WHITE);
@@ -44,7 +51,7 @@ public class PantallaInicio extends JFrame {
 
         gbc.gridwidth = 1;
 
-        // Usuario
+        // Campo: Usuario
         JLabel lblUsuario = new JLabel("Usuario:");
         lblUsuario.setForeground(Color.WHITE);
         gbc.gridx = 0;
@@ -56,7 +63,7 @@ public class PantallaInicio extends JFrame {
         gbc.gridy = 1;
         panel.add(txtUsuario, gbc);
 
-        // Contraseña
+        // Campo: Contraseña
         JLabel lblContraseña = new JLabel("Contraseña:");
         lblContraseña.setForeground(Color.WHITE);
         gbc.gridx = 0;
@@ -68,7 +75,7 @@ public class PantallaInicio extends JFrame {
         gbc.gridy = 2;
         panel.add(txtContraseña, gbc);
 
-        // Nombre
+        // Campo: Nombre (para registro)
         JLabel lblNombre = new JLabel("Nombre:");
         lblNombre.setForeground(Color.WHITE);
         gbc.gridx = 0;
@@ -80,7 +87,7 @@ public class PantallaInicio extends JFrame {
         gbc.gridy = 3;
         panel.add(txtNombre, gbc);
 
-        // Email
+        // Campo: Email (para registro)
         JLabel lblEmail = new JLabel("Email:");
         lblEmail.setForeground(Color.WHITE);
         gbc.gridx = 0;
@@ -92,7 +99,7 @@ public class PantallaInicio extends JFrame {
         gbc.gridy = 4;
         panel.add(txtEmail, gbc);
 
-        // Teléfono
+        // Campo: Teléfono (para registro)
         JLabel lblTelefono = new JLabel("Teléfono:");
         lblTelefono.setForeground(Color.WHITE);
         gbc.gridx = 0;
@@ -104,22 +111,23 @@ public class PantallaInicio extends JFrame {
         gbc.gridy = 5;
         panel.add(txtTelefono, gbc);
 
-        // Botones
+        // Botón: Iniciar sesión
         JButton btnLogin = new JButton("Iniciar Sesión");
         btnLogin.setBackground(azulClaro);
         gbc.gridx = 0;
         gbc.gridy = 6;
         panel.add(btnLogin, gbc);
 
+        // Botón: Registrarse
         JButton btnRegistro = new JButton("Registrarse");
         btnRegistro.setBackground(azulClaro);
         gbc.gridx = 1;
         gbc.gridy = 6;
         panel.add(btnRegistro, gbc);
 
-        add(panel);
+        add(panel); // Se agrega el panel a la ventana
 
-        // Acción de login
+        // Acción del botón "Iniciar Sesión"
         btnLogin.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -127,9 +135,12 @@ public class PantallaInicio extends JFrame {
                 String contraseña = new String(txtContraseña.getPassword());
 
                 Usuario u = usuarioController.login(usuario, contraseña);
+
                 if (u != null) {
                     JOptionPane.showMessageDialog(null, "Inicio de sesión exitoso");
-                    dispose();
+                    dispose(); // Cierra esta ventana
+
+                    // Abre panel correspondiente según rol
                     if (usuarioController.esAdmin(u)) {
                         new PanelAdmin(u).setVisible(true);
                     } else {
@@ -141,13 +152,14 @@ public class PantallaInicio extends JFrame {
             }
         });
 
-        // Acción de registro
+        // Acción del botón "Registrarse"
         btnRegistro.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String usuario = txtUsuario.getText();
                 String contraseña = new String(txtContraseña.getPassword());
 
+                // Validación básica
                 if (usuario.isEmpty() || contraseña.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Rellene los campos de usuario y contraseña", "Error", JOptionPane.WARNING_MESSAGE);
                     return;
@@ -157,6 +169,7 @@ public class PantallaInicio extends JFrame {
                 String email = txtEmail.getText();
                 String telefono = txtTelefono.getText();
 
+                // Crea un nuevo usuario con rol "cliente"
                 Usuario nuevo = new Usuario(0, usuario, contraseña, "cliente", nombre, email, telefono);
                 Usuario registrado = usuarioController.registrarUsuario(nuevo);
 

@@ -1,6 +1,7 @@
 package modelo;
 
 public class Usuario {
+    // Variables
     private int idUsuario;
     private String nombreUsuario;
     private String contraseña;
@@ -9,6 +10,7 @@ public class Usuario {
     private String email;
     private String telefono;
 
+    // Constructores
     public Usuario(int idUsuario, String nombreUsuario, String contraseña, String rol, String nombre, String email, String telefono) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
@@ -19,10 +21,9 @@ public class Usuario {
         this.telefono = telefono;
     }
 
-    public Usuario() {
+    public Usuario() {}
 
-    }
-
+    // Getters y setters
     public int getIdUsuario() {
         return idUsuario;
     }

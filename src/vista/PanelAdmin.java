@@ -1,5 +1,6 @@
 package vista;
 
+import controlador.CompraController;
 import controlador.ZapatillaController;
 import modelo.Usuario;
 import modelo.Zapatilla;
@@ -16,6 +17,7 @@ public class PanelAdmin extends JFrame {
     private DefaultTableModel modeloTabla;
     private JScrollPane scrollPaneTabla;
     private ZapatillaController zapatillaController = new ZapatillaController();
+    private CompraController compraController = new CompraController();
     private JLabel lblMensaje;
     private boolean modoEdicion = false;
 
@@ -27,17 +29,20 @@ public class PanelAdmin extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // Colores de diseño
         Color fondoAzulAdmin = new Color(0xE1F5FE);
         Color azulBotonAdmin = new Color(0x0288D1);
         Color azulHoverAdmin = new Color(0x0277BD);
         Color textoAzulOscuroAdmin = new Color(0x01579B);
         Color bordeSuaveAdmin = new Color(0xB3E5FC);
 
+        // Panel principal
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         panel.setBackground(fondoAzulAdmin);
 
+        // Título de bienvenida
         JLabel lblTitulo = new JLabel("Bienvenido, Administrador " + admin.getNombreUsuario(), JLabel.CENTER);
         lblTitulo.setFont(new Font("Arial", Font.BOLD, 22));
         lblTitulo.setForeground(textoAzulOscuroAdmin);
@@ -45,21 +50,27 @@ public class PanelAdmin extends JFrame {
         panel.add(lblTitulo);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        JPanel panelBotones = new JPanel(new GridLayout(2, 2, 15, 15));
+        // Panel de botones
+        JPanel panelBotones = new JPanel(new GridLayout(3, 2, 15, 15));
         panelBotones.setBackground(fondoAzulAdmin);
 
+        // Botones de acciones
         JButton btnVerZapatillas = crearBoton("Ver Zapatillas", azulBotonAdmin, azulHoverAdmin, Color.WHITE);
         JButton btnEditarZapatillas = crearBoton("Editar Zapatillas", azulBotonAdmin, azulHoverAdmin, Color.WHITE);
         JButton btnGestionZapatillas = crearBoton("Añadir/Eliminar Zapatillas", azulBotonAdmin, azulHoverAdmin, Color.WHITE);
         JButton btnCerrarSesion = crearBoton("Cerrar Sesión", azulBotonAdmin, azulHoverAdmin, Color.WHITE);
+        JButton btnIngresosTotales = crearBoton("Ingresos Totales", azulBotonAdmin, azulHoverAdmin, Color.WHITE);
 
+        // Agregamos todos los botones al panel
         panelBotones.add(btnVerZapatillas);
         panelBotones.add(btnEditarZapatillas);
         panelBotones.add(btnGestionZapatillas);
         panelBotones.add(btnCerrarSesion);
+        panelBotones.add(btnIngresosTotales);
         panel.add(panelBotones);
         panel.add(Box.createRigidArea(new Dimension(0, 20)));
 
+        // Tabla de zapatillas
         modeloTabla = new DefaultTableModel(new String[]{"ID", "Marca", "Modelo", "Talla", "Precio", "Stock"}, 0);
         tablaZapatillas = new JTable(modeloTabla);
         scrollPaneTabla = new JScrollPane(tablaZapatillas);
@@ -68,7 +79,7 @@ public class PanelAdmin extends JFrame {
         scrollPaneTabla.setBackground(bordeSuaveAdmin);
         panel.add(scrollPaneTabla);
 
-        // Etiqueta de mensaje
+        // Mensaje informativo
         lblMensaje = new JLabel("Haz clic para editar una zapatilla");
         lblMensaje.setFont(new Font("Arial", Font.ITALIC, 14));
         lblMensaje.setForeground(textoAzulOscuroAdmin);
@@ -77,7 +88,7 @@ public class PanelAdmin extends JFrame {
         panel.add(Box.createRigidArea(new Dimension(0, 10)));
         panel.add(lblMensaje);
 
-        // Acción: ver zapatillas
+        // Acción para ver zapatillas
         btnVerZapatillas.addActionListener(e -> {
             modoEdicion = false;
             lblMensaje.setVisible(false);
@@ -94,10 +105,9 @@ public class PanelAdmin extends JFrame {
             revalidate();
         });
 
-        // Acción: editar zapatillas o retroceder
+        // Acción para editar zapatillas
         btnEditarZapatillas.addActionListener(e -> {
             if (!modoEdicion) {
-                // Entrar en modo edición
                 modoEdicion = true;
                 cargarZapatillas();
                 scrollPaneTabla.setVisible(true);
@@ -106,7 +116,6 @@ public class PanelAdmin extends JFrame {
                 btnEditarZapatillas.setText("Ocultar Zapatillas");
                 btnVerZapatillas.setText("Ver Zapatillas");
             } else {
-                // Salir de modo edición
                 modoEdicion = false;
                 scrollPaneTabla.setVisible(false);
                 lblMensaje.setVisible(false);
@@ -116,14 +125,22 @@ public class PanelAdmin extends JFrame {
             revalidate();
         });
 
-
-        // Acción: cerrar sesión
+        // Acción para cerrar sesión
         btnCerrarSesion.addActionListener(e -> {
             dispose();
             new PantallaInicio().setVisible(true);
         });
 
-        // Clic para editar (solo si está en modo edición)
+        // Acción para mostrar ingresos totales
+        btnIngresosTotales.addActionListener(e -> {
+            double total = compraController.calcularIngresosTotales();
+            JOptionPane.showMessageDialog(this,
+                    "Los ingresos totales acumulados son: $" + String.format("%.2f", total),
+                    "Ingresos Totales",
+                    JOptionPane.INFORMATION_MESSAGE);
+        });
+
+        // Acción de clic para editar en la tabla
         tablaZapatillas.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (modoEdicion && e.getClickCount() == 1 && tablaZapatillas.getSelectedRow() != -1) {
@@ -139,6 +156,7 @@ public class PanelAdmin extends JFrame {
             }
         });
 
+        // Acción para agregar o eliminar zapatillas
         btnGestionZapatillas.addActionListener(e -> {
             String[] opciones = {"Agregar Zapatilla", "Eliminar Zapatilla", "Cancelar"};
             int eleccion = JOptionPane.showOptionDialog(
@@ -162,6 +180,7 @@ public class PanelAdmin extends JFrame {
         add(panel);
     }
 
+    // Método para cargar las zapatillas en la tabla
     private void cargarZapatillas() {
         modeloTabla.setRowCount(0);
         List<Zapatilla> lista = zapatillaController.obtenerTodas();
@@ -172,6 +191,7 @@ public class PanelAdmin extends JFrame {
         }
     }
 
+    // Estilo de los botones
     private JButton crearBoton(String texto, Color colorFondo, Color colorHover, Color colorTexto) {
         JButton boton = new JButton(texto);
         boton.setBackground(colorFondo);
@@ -194,6 +214,7 @@ public class PanelAdmin extends JFrame {
         return boton;
     }
 
+    // Diálogo para editar zapatilla
     private void mostrarDialogoEditar(Zapatilla zapatilla) {
         JTextField txtMarca = new JTextField(zapatilla.getMarca());
         JTextField txtModelo = new JTextField(zapatilla.getModelo());
@@ -233,6 +254,8 @@ public class PanelAdmin extends JFrame {
             }
         }
     }
+
+    // Diálogo para agregar zapatilla
     private void mostrarDialogoAgregar() {
         JTextField txtMarca = new JTextField();
         JTextField txtModelo = new JTextField();
@@ -274,8 +297,8 @@ public class PanelAdmin extends JFrame {
         }
     }
 
+    // Diálogo para eliminar zapatilla
     private void mostrarDialogoEliminar() {
-        // Crear tabla con zapatillas
         List<Zapatilla> lista = zapatillaController.obtenerTodas();
 
         String[] columnas = {"ID", "Marca", "Modelo", "Talla", "Precio", "Stock"};
@@ -309,7 +332,7 @@ public class PanelAdmin extends JFrame {
             if (confirmacion == JOptionPane.YES_OPTION) {
                 if (zapatillaController.eliminarZapatilla(id)) {
                     JOptionPane.showMessageDialog(this, "Zapatilla eliminada correctamente.");
-                    cargarZapatillas(); // Refresca la tabla principal
+                    cargarZapatillas();
                 } else {
                     JOptionPane.showMessageDialog(this, "No se pudo eliminar la zapatilla.");
                 }
@@ -318,6 +341,4 @@ public class PanelAdmin extends JFrame {
             JOptionPane.showMessageDialog(this, "Debes seleccionar una zapatilla para eliminar.");
         }
     }
-
-
 }

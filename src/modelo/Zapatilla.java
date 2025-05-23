@@ -1,6 +1,7 @@
 package modelo;
 
 public class Zapatilla {
+    // Variables
     private int idZapatilla;
     private String marca;
     private String modelo;
@@ -8,6 +9,7 @@ public class Zapatilla {
     private double precio;
     private int stock;
 
+    // Constructores
     public Zapatilla(int idZapatilla, String marca, String modelo, float talla, double precio, int stock) {
         this.idZapatilla = idZapatilla;
         this.marca = marca;
@@ -20,6 +22,7 @@ public class Zapatilla {
     public Zapatilla() {
     }
 
+    // Getters y setters
     public int getIdZapatilla() {
         return idZapatilla;
     }

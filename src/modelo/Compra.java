@@ -3,6 +3,7 @@ package modelo;
 import java.sql.Date;
 
 public class Compra {
+    // Variables
     private int idCompra;
     private int idCliente;
     private int idZapatilla;
@@ -11,6 +12,7 @@ public class Compra {
     private double total;
     private String modeloZapatilla;
 
+    // Constructores
     public Compra(int idCompra, int idCliente, int idZapatilla, Date fechaCompra, int cantidad, double total) {
         this.idCompra = idCompra;
         this.idCliente = idCliente;
@@ -23,6 +25,7 @@ public class Compra {
     public Compra() {
     }
 
+    // Getters y setters
     public int getIdCompra() {
         return idCompra;
     }
